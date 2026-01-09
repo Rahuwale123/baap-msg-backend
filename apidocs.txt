@@ -1,0 +1,273 @@
+BAAPMSG API DOCUMENTATION (v1)
+==============================
+
+Base URL: http://localhost:3000
+Auth: Bearer Token (JWT) required for all Dashboard, OTP, and WhatsApp APIs.
+
+--------------------------------------------------------------------------------
+1. AUTHENTICATION
+--------------------------------------------------------------------------------
+
+1.1 REGISTER
+POST /auth/register
+Body:
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123",
+  "first_name": "Rahul",
+  "last_name": "Wale"
+}
+
+cURL:
+curl -X POST http://localhost:3000/auth/register \
+-H "Content-Type: application/json" \
+-d '{"email":"user@example.com", "password":"StrongPassword123", "first_name":"Rahul", "last_name":"Wale"}'
+
+Response (201 Created):
+{
+  "access_token": "eyJhbG...",
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com"
+  }
+}
+
+1.2 LOGIN
+POST /auth/login
+Body:
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123"
+}
+
+cURL:
+curl -X POST http://localhost:3000/auth/login \
+-H "Content-Type: application/json" \
+-d '{"email":"user@example.com", "password":"StrongPassword123"}'
+
+Response (200 OK):
+{
+  "access_token": "eyJhbG...",
+  "expires_in": 86400
+}
+
+--------------------------------------------------------------------------------
+2. OTP SYSTEM (API KEY PROTECTED)
+--------------------------------------------------------------------------------
+
+2.1 SEND OTP
+POST /otp/send-otp
+Header: x-api-key: <YOUR_API_KEY>
+Body:
+{
+  "to": "+919876543210",
+  "length": 6
+}
+
+cURL:
+curl -X POST http://localhost:3000/otp/send-otp \
+-H "x-api-key: YOUR_API_KEY_HERE" \
+-H "Content-Type: application/json" \
+-d '{"to": "+919876543210", "length": 6}'
+
+Response (200 OK):
+{
+  "otp_id": "uuid"
+}
+
+2.2 VERIFY OTP
+POST /otp/verify-otp
+Header: x-api-key: <YOUR_API_KEY>
+Body:
+{
+  "otp_id": "uuid",
+  "code": "123456"
+}
+
+cURL:
+curl -X POST http://localhost:3000/otp/verify-otp \
+-H "x-api-key: YOUR_API_KEY_HERE" \
+-H "Content-Type: application/json" \
+-d '{"otp_id": "uuid", "code": "123456"}'
+
+Response (200 OK):
+{
+  "verified": true
+}
+
+--------------------------------------------------------------------------------
+3. WHATSAPP MODULE (JWT PROTECTED)
+--------------------------------------------------------------------------------
+
+3.1 GET STATUS
+GET /whatsapp/status
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/whatsapp/status
+
+Response (200 OK):
+{
+  "status": "connected"
+}
+
+3.2 GET QR (IMAGE DATA URL)
+GET /whatsapp/qr
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/whatsapp/qr
+
+Response (200 OK):
+{
+  "qr": "data:image/png;base64,..."
+}
+
+3.3 CONNECT (INITIATE)
+POST /whatsapp/connect
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -X POST -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/whatsapp/connect
+
+Response (200 OK):
+{
+  "message": "WhatsApp connection initiated. Check server terminal for QR code."
+}
+
+3.4 DISCONNECT
+POST /whatsapp/disconnect
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -X POST -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/whatsapp/disconnect
+
+Response (200 OK):
+{
+  "success": true,
+  "message": "Disconnected"
+}
+
+--------------------------------------------------------------------------------
+4. DASHBOARD APIs (JWT PROTECTED)
+--------------------------------------------------------------------------------
+
+4.1 GET ME (PROFILE)
+GET /dashboard/me
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/dashboard/me
+
+Response (200 OK):
+{
+  "user": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "first_name": "Rahul",
+    "last_name": "Wale",
+    "status": "active",
+    "created_at": "2026-01-09T...",
+    "last_login_at": "2026-01-09T..."
+  },
+  "usage": {
+    "total_messages": 5
+  }
+}
+
+4.2 LIST API KEYS
+GET /dashboard/keys
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/dashboard/keys
+
+Response (200 OK):
+[
+  {
+    "id": "uuid",
+    "name": "My Prod Key",
+    "is_active": true,
+    "created_at": "2026-01-09T..."
+  }
+]
+
+4.3 CREATE API KEY
+POST /dashboard/keys
+Header: Authorization: Bearer <TOKEN>
+Body:
+{
+  "name": "New Key"
+}
+
+cURL:
+curl -X POST http://localhost:3000/dashboard/keys \
+-H "Authorization: Bearer <JWT_TOKEN>" \
+-H "Content-Type: application/json" \
+-d '{"name": "New Key"}'
+
+Response (200 OK):
+{
+  "id": "uuid",
+  "name": "New Key",
+  "api_key": "sk_abc123..."
+}
+
+4.4 COPY API KEY (REVEAL)
+GET /dashboard/keys/:id/copy
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/dashboard/keys/uuid-here/copy
+
+Response (200 OK):
+{
+  "api_key": "sk_abc123..."
+}
+
+4.5 DELETE API KEY
+DELETE /dashboard/keys/:id
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -X DELETE http://localhost:3000/dashboard/keys/uuid-here \
+-H "Authorization: Bearer <JWT_TOKEN>"
+
+Response (200 OK):
+{
+  "message": "API key revoked"
+}
+
+4.6 GET ANALYTICS
+GET /dashboard/analytics
+Header: Authorization: Bearer <TOKEN>
+
+cURL:
+curl -H "Authorization: Bearer <JWT_TOKEN>" http://localhost:3000/dashboard/analytics
+
+Response (200 OK):
+[
+  {
+    "status": "sent",
+    "count": "10"
+  },
+  {
+    "status": "failed",
+    "count": "2"
+  }
+]
+
+--------------------------------------------------------------------------------
+5. HEALTH CHECK
+--------------------------------------------------------------------------------
+
+GET /health
+
+cURL:
+curl http://localhost:3000/health
+
+Response (200 OK):
+{
+  "status": "ok",
+  "timestamp": "2026-01-09T..."
+}
