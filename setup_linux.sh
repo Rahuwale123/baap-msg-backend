@@ -11,7 +11,7 @@ echo "Installing Puppeteer dependencies..."
 sudo apt-get install -y \
     ca-certificates \
     fonts-liberation \
-    libasound2 \
+    libasound2t64 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
     libc6 \
@@ -21,8 +21,7 @@ sudo apt-get install -y \
     libexpat1 \
     libfontconfig1 \
     libgbm1 \
-    libgcc1 \
-    libgconf-2-4 \
+    libgcc-s1 \
     libgdk-pixbuf2.0-0 \
     libglib2.0-0 \
     libgtk-3-0 \
@@ -46,7 +45,12 @@ sudo apt-get install -y \
     libxtst6 \
     lsb-release \
     wget \
-    xdg-utils
+    xdg-utils \
+    libnss3-dev \
+    libgdk-pixbuf2.0-dev \
+    libgtk-3-dev \
+    libxss-dev \
+    libasound2-dev
 
 echo "Installation complete!"
 echo "You can now run: npm start"
